@@ -139,11 +139,11 @@ def train():
 
             if np.random.random() > 0.7:
                 data, target_a, target_b, lam = mixup_data(data, target)
-                output = model(data)
+                output, _ = model(data)
                 loss = mixup_criterion(
                     criterion, output, target_a, target_b, lam)
             else:
-                output = model(data)
+                output, _ = model(data)
                 loss = criterion(output, target)
 
             optimizer.zero_grad()
@@ -169,7 +169,7 @@ def train():
         with torch.no_grad():
             for data, target in test_dataloader:
                 data, target = data.to(device), target.to(device)
-                outputs = model(data)
+                outputs, _ = model(data)
                 loss = criterion(outputs, target)
                 val_loss += loss.item()
 
@@ -193,7 +193,7 @@ def train():
                 'accuracy': accuracy,
                 'epoch': epoch,
                 'classes': train_dataset.classes
-            }, '/models/best_model.pth')
+            }, './best_model.pth')
             print(f'New best model saved: {accuracy:.2f}%')
 
     writer.close()

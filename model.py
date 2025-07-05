@@ -1,14 +1,14 @@
-
 import torch 
 import torch.nn as nn
 
 class residualBlock(nn.Module):
-    def __init__(self, in_channel, out_channel, stride):
+    def __init__(self, in_channel, out_channel, stride=1):
         super(residualBlock, self).__init__()
         self.conv1 = nn.Conv2d(in_channel, out_channel, kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(out_channel)
         self.relu = nn.ReLU(inplace=True)
-        self.conv2 = nn.Conv2d(in_channel, in_channel, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.conv2 = nn.Conv2d(out_channel, out_channel, kernel_size=3, stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(out_channel)
         self.shortcut = nn.Sequential()
         self.use_shortcut = stride != 1 or in_channel != out_channel
         if self.use_shortcut:
@@ -22,7 +22,7 @@ class residualBlock(nn.Module):
         out = self.bn1(out)
         out = self.relu(out)
         out = self.conv2(out)
-        out = self.bn1(out)
+        out = self.bn2(out)
         out += residual
 
         if fmap_dict is not None:
@@ -33,7 +33,6 @@ class residualBlock(nn.Module):
         if fmap_dict is not None:
             fmap_dict[f"{prefix}.out"] = out
         return out
-    
 
 class audioCNN(nn.Module):
     def __init__(self, num_classes=50):
@@ -62,7 +61,7 @@ class audioCNN(nn.Module):
     def forward(self, x, return_feature_map=False):
         feature_maps = {}
         if return_feature_map != False:
-            feature_maps["conv1"] = self.conv1(x)
+            feature_maps["conv1"] = self.init_conv(x)
             x = feature_maps["conv1"]
         else:
             x = self.init_conv(x)
@@ -79,8 +78,8 @@ class audioCNN(nn.Module):
 
         x = block_forward(self.layer1, x, "layer1") 
         x = block_forward(self.layer2, x, "layer2")
-        x = block_forward(self.layer2, x, "layer3")
-        x = block_forward(self.layer2, x, "layer4")
+        x = block_forward(self.layer3, x, "layer3")
+        x = block_forward(self.layer4, x, "layer4")
 
         x = self.adpt_pool(x)
         x = self.flatten(x)
