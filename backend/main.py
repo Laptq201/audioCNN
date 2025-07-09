@@ -49,7 +49,7 @@ class audioProcessor:
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-checkpoint_path = "./best_model.pth"
+checkpoint_path = "./models/best_model.pth"
 checkpoint = torch.load(checkpoint_path, map_location=device)
 classes = checkpoint['classes']
 

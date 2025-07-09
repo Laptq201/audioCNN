@@ -118,6 +118,7 @@ export default function HomePage() {
   const [vizData, setVizData] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [fileName, setFileName] = useState("");
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = async (
@@ -127,6 +128,7 @@ export default function HomePage() {
     if (!file) return;
 
     setFileName(file.name);
+    setAudioUrl(URL.createObjectURL(file)); 
     setIsLoading(true);
     setError(null);
     setVizData(null);
@@ -223,7 +225,19 @@ export default function HomePage() {
             </CardContent>
           </Card>
         )}
-
+        {fileName && (
+          <div className="mt-4 flex flex-col items-center space-y-4">
+            {audioUrl && (
+              <audio
+                controls
+                src={audioUrl}
+                className="w-full max-w-md rounded shadow-sm"
+              >
+                Your browser does not support the audio element.
+              </audio>
+            )}
+          </div>
+        )}
         {vizData && (
           <div className="space-y-8">
             <Card>

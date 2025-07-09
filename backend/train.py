@@ -13,7 +13,7 @@ from torch.optim.lr_scheduler import OneCycleLR
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 
-from model import audioCNN
+from backend.model import audioCNN
 class ESC50Dataset(Dataset):
     def __init__(self, data_dir, metadata_file, split="train", transform=None):
         super().__init__()
